@@ -20,36 +20,38 @@ jobs:
 
     steps:
       - name: Checkout
-      - uses: actions/checkout@main
-      - uses: actions/setup-node@v2.4.1
-        with:
-          node-version: '14'
-          cache: 'npm'
-
+        uses: actions/checkout@main
+        
       - name: Set Git Configs & Secrets
-      - run: |
-          sudo apt-get install -y git ffmpeg
+        continue-on-error: true
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
           git config --global user.email ${GH_EMAIL}
           git config --global user.name ${GH_USERID}
           git config --global credential.helper store
           echo "https://${GH_USERID}:${{ secrets.PAT }}@github.com" > ~/.git-credentials
-      - name: Clone Remix Calls Repo
-        continue-on-error: true
-      - run: |
           git clone https://github.com/callsmusic/remix source
+          sudo apt-get install -y ffmpeg
+          
+      - name: RUN BOT
+        continue-on-error: true
+        run: |
+          nvm install node
           cd source
           npm install
           npm start
+      
       - name: running VC bot
         timeout-minutes: 338
         continue-on-error: true
-      - run: |
+        run: |
           cd source
           npm install
           npm start
+
       - name: Loop Workflow
         continue-on-error: true
-      - run: |
+        run: |
          git clone https://${{ secrets.PAT }}@github.com/${GITHUB_REPOSITORY} loop
           cd loop || exit 1
           echo $(( RANDOM - ( RANDOM % RANDOM ) )) > looper.txt
