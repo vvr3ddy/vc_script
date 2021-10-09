@@ -1,0 +1,58 @@
+name: VC
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: 'README.md'
+  workflow_dispatch:
+   
+env:
+  GH_EMAIL: ${{ secrets.GH_EMAIL }}
+  GH_USERID: ${{ secrets.GH_USERID }}
+  BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+  STRING_SESSION: ${{ secrets.STRING_SESSION }}
+  API_ID: ${{ secrets.API_ID }}
+  API_HASH: ${{ secrets.API_HASH }}
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+      - uses: actions/checkout@main
+      - uses: actions/setup-node
+        with:
+          node-version: '14'
+          cache: 'npm'
+
+      - name: Set Git Configs & Secrets
+        run: |
+          sudo apt-get install -y git ffmpeg
+          git config --global user.email ${GH_EMAIL}
+          git config --global user.name ${GH_USERID}
+          git config --global credential.helper store
+          echo "https://${GH_USERID}:${{ secrets.PAT }}@github.com" > ~/.git-credentials
+      - name: Clone Remix Calls Repo
+        continue-on-error: true
+        run: |
+          git clone https://github.com/callsmusic/remix source
+          cd source
+          npm install
+          npm start
+      - name: running VC bot
+        timeout-minutes: 338
+        continue-on-error: true
+        run: |
+          cd source
+          npm install
+          npm start
+      - name: Loop Workflow
+        continue-on-error: true
+        run: |
+         git clone https://${{ secrets.PAT }}@github.com/${GITHUB_REPOSITORY} loop
+          cd loop || exit 1
+          echo $(( RANDOM - ( RANDOM % RANDOM ) )) > looper.txt
+          git add looper.txt
+          git commit -m "Workflow : Loop at $(date -u +%D-%T%P)"
+          git push -q https://${{ secrets.PAT }}@github.com/${GITHUB_REPOSITORY} HEAD:main
