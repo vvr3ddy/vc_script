@@ -9,10 +9,6 @@ on:
 env:
   GH_EMAIL: ${{ secrets.GH_EMAIL }}
   GH_USERID: ${{ secrets.GH_USERID }}
-  BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-  STRING_SESSION: ${{ secrets.STRING_SESSION }}
-  API_ID: ${{ secrets.API_ID }}
-  API_HASH: ${{ secrets.API_HASH }}
 
 jobs:
   debug:
@@ -25,34 +21,23 @@ jobs:
       - name: Set Git Configs & Secrets
         continue-on-error: true
         run: |
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
           git config --global user.email ${GH_EMAIL}
           git config --global user.name ${GH_USERID}
           git config --global credential.helper store
           echo "https://${GH_USERID}:${{ secrets.PAT }}@github.com" > ~/.git-credentials
           git clone https://github.com/callsmusic/remix source
-          sudo apt-get install -y ffmpeg
           
-      - name: RUN BOT
-        continue-on-error: true
-        run: |
-          nvm install node
-          cd source
-          npm install
-          npm start
-      
       - name: running VC bot
         timeout-minutes: 338
         continue-on-error: true
         run: |
           cd source
-          npm install
-          npm start
+          
 
       - name: Loop Workflow
         continue-on-error: true
         run: |
-         git clone https://${{ secrets.PAT }}@github.com/${GITHUB_REPOSITORY} loop
+          git clone https://${{ secrets.PAT }}@github.com/${GITHUB_REPOSITORY} loop
           cd loop || exit 1
           echo $(( RANDOM - ( RANDOM % RANDOM ) )) > looper.txt
           git add looper.txt

@@ -1,0 +1,21 @@
+kind: pipeline
+name: default
+
+
+steps:
+- name: clone source
+  image: node
+  environment:
+    BOT_TOKEN:
+      from_secret: BOT_TOKEN
+    API_ID:
+      from_secret: API_ID
+    API_HASH:
+      from_secret: API_HASH
+    STRING_SESSION:
+      from_secret: STRING_SESSION 
+  commands:
+  - git clone github.com/callsmusic/remix source
+  - cd source
+  - npm install
+  - npm start
