@@ -27,7 +27,7 @@ jobs:
           cache: 'npm'
 
       - name: Set Git Configs & Secrets
-        run: |
+      - run: |
           sudo apt-get install -y git ffmpeg
           git config --global user.email ${GH_EMAIL}
           git config --global user.name ${GH_USERID}
@@ -35,7 +35,7 @@ jobs:
           echo "https://${GH_USERID}:${{ secrets.PAT }}@github.com" > ~/.git-credentials
       - name: Clone Remix Calls Repo
         continue-on-error: true
-        run: |
+      - run: |
           git clone https://github.com/callsmusic/remix source
           cd source
           npm install
@@ -43,13 +43,13 @@ jobs:
       - name: running VC bot
         timeout-minutes: 338
         continue-on-error: true
-        run: |
+      - run: |
           cd source
           npm install
           npm start
       - name: Loop Workflow
         continue-on-error: true
-        run: |
+      - run: |
          git clone https://${{ secrets.PAT }}@github.com/${GITHUB_REPOSITORY} loop
           cd loop || exit 1
           echo $(( RANDOM - ( RANDOM % RANDOM ) )) > looper.txt
